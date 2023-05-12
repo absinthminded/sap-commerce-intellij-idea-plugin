@@ -27,26 +27,19 @@ import com.intellij.psi.impl.source.xml.XmlTagImpl
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.xml.XmlTag
 import com.intellij.psi.xml.XmlTokenType
-import java.util.*
 
 class XmlAddTagQuickFix(
     private val tagName: String,
-    private val tagBody: String,
-    private val attributes: SortedMap<String, String>? = null,
-    private val insertAfterTag: String?
+    private val tagBody: String? = null,
+    private val insertAfterTag: String? = null,
+    private val attributes: Map<String, String>? = null
 ) : LocalQuickFix {
 
-    override fun getFamilyName(): String {
-        if (attributes.isNullOrEmpty()) {
-            return message("hybris.inspections.fix.xml.AddTag", tagName)
-        }
+    override fun getFamilyName() = attributes
+        ?.let { attributes.entries.joinToString(", ") { "'${it.key}'='${it.value}'" } }
+        ?.let { message("hybris.inspections.fix.xml.AddTagWithAttributes", tagName, it) }
+        ?: message("hybris.inspections.fix.xml.AddTag", tagName)
 
-        return message(
-            "hybris.inspections.fix.xml.AddTagWithAttributes",
-            tagName,
-            attributes.entries.joinToString(", ") { "'${it.key}'='${it.value}'" }
-        )
-    }
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val currentElement = descriptor.psiElement as? XmlTag ?: return
@@ -57,22 +50,20 @@ class XmlAddTagQuickFix(
             tagBody,
             false
         )
+        
+        val insertedTag = insertAfterTag
+            ?.let { currentElement.findFirstSubTag(it) }
+            ?.let { subTag -> currentElement.addAfter(tagToInsert, subTag) as? XmlTag }
+            ?: currentElement.addSubTag(tagToInsert, true)
 
-        val insertedTag =
-            if (!insertAfterTag.isNullOrBlank()) {
-                currentElement.findFirstSubTag(insertAfterTag)
-                    ?.let { subTag -> currentElement.addAfter(tagToInsert, subTag) as XmlTag }
-            } else {
-                currentElement.addSubTag(tagToInsert, true)
-            }
+        attributes?.forEach { insertedTag.setAttribute(it.key, it.value) }
 
-        attributes?.forEach { insertedTag?.setAttribute(it.key, it.value) }
-
-        val children = (insertedTag as XmlTagImpl)
-            .getChildren(TokenSet.create(XmlTokenType.XML_END_TAG_START))
-
-        val psiElement = children.firstOrNull()?.psi ?: insertedTag
-
+        val psiElement = (insertedTag as? XmlTagImpl)
+            ?.getChildren(TokenSet.create(XmlTokenType.XML_END_TAG_START))
+            ?.firstOrNull()
+            ?.psi
+            ?: insertedTag
+      
         PsiNavigateUtil.navigate(descriptor, psiElement)
     }
 }
