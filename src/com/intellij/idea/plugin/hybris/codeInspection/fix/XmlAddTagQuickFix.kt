@@ -40,6 +40,7 @@ class XmlAddTagQuickFix(
         ?.let { message("hybris.inspections.fix.xml.AddTagWithAttributes", tagName, it) }
         ?: message("hybris.inspections.fix.xml.AddTag", tagName)
 
+
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val currentElement = descriptor.psiElement as? XmlTag ?: return
 
@@ -49,7 +50,7 @@ class XmlAddTagQuickFix(
             tagBody,
             false
         )
-
+        
         val insertedTag = insertAfterTag
             ?.let { currentElement.findFirstSubTag(it) }
             ?.let { subTag -> currentElement.addAfter(tagToInsert, subTag) as? XmlTag }
@@ -62,7 +63,7 @@ class XmlAddTagQuickFix(
             ?.firstOrNull()
             ?.psi
             ?: insertedTag
-
+      
         PsiNavigateUtil.navigate(descriptor, psiElement)
     }
 }
