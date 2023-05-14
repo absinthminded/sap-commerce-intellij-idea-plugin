@@ -78,7 +78,7 @@ public class ImpexFileCreateAction extends CreateFileFromTemplateAction implemen
 
     @Override
     protected boolean isAvailable(final DataContext dataContext) {
-        return super.isAvailable(dataContext) && ActionUtils.isHybrisContext(dataContext);
+        return super.isAvailable(dataContext) && ActionUtils.INSTANCE.isHybrisContext(dataContext);
     }
 
     @Override
