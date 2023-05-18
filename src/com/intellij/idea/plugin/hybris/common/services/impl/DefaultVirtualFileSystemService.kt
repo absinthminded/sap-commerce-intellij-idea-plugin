@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.intellij.idea.plugin.hybris.common.services.impl;
 
 import com.intellij.idea.plugin.hybris.common.services.VirtualFileSystemService
@@ -29,7 +28,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import java.io.File
 import java.io.IOException
-
 
 class DefaultVirtualFileSystemService : VirtualFileSystemService {
 
