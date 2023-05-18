@@ -61,7 +61,7 @@ class FlexibleSearchQueryLineMarkerProvider : LineMarkerProviderDescriptor() {
         if (element !is PsiPolyadicExpression) return null
         val parent = element.parent
         if (parent !is PsiVariable || parent.nameIdentifier == null) return null
-        if (!CommonIdeaService.getInstance().isHybrisProject(element.project)) return null
+        if (!CommonIdeaService.instance.isHybrisProject(element.project)) return null
 
         val expression = computeExpression(element)
         val formattedExpression = formatExpression(element.project, expression)
