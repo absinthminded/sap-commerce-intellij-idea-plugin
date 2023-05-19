@@ -30,11 +30,10 @@ interface CommonIdeaService {
 
     fun isTypingActionInProgress(): Boolean
 
-    /*fun getHybrisDirectory(project: Project): Optional<String>*///TODO Looks unused
-
-    /*fun getCustomDirectory(project: Project): Optional<String>//TODO Looks Unused*/
-
-    fun isHybrisProject(project: Project): Boolean
+    /*fun getHybrisDirectory(project: Project): Optional<String>*/
+/*
+    fun getCustomDirectory(project: Project): Optional<String>
+*/
 
     fun isOutDatedHybrisProject(project: Project): Boolean
 
