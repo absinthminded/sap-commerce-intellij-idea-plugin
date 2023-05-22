@@ -51,18 +51,19 @@ class HybrisProjectStructureStartupActivity : ProjectActivity {
         if (project.isDisposed) return
 
         val commonIdeaService = ApplicationManager.getApplication().getService(CommonIdeaService::class.java)
-        val isHybrisProject = HybrisProjectSettingsComponent.getInstance(project).isHybrisProject()
+        val instance = HybrisProjectSettingsComponent.getInstance(project)
+        val isHybrisProject = instance.isHybrisProject()
 
         if (isHybrisProject) {
-            commonIdeaService.refreshProjectSettings(project)
+            instance.registerCloudExtensions()
 
-            if (commonIdeaService.isOutDatedHybrisProject(project)) {
+            if (instance.isOutdatedHybrisProject()) {
                 Notifications.create(
                     NotificationType.INFORMATION,
                     HybrisI18NBundleUtils.message("hybris.notification.project.open.outdated.title"),
                     HybrisI18NBundleUtils.message(
                         "hybris.notification.project.open.outdated.text",
-                        HybrisProjectSettingsComponent.getInstance(project).state.importedByVersion ?: "old"
+                        instance.state.importedByVersion ?: "old"
                     )
                 )
                     .important(true)
@@ -122,7 +123,7 @@ class HybrisProjectStructureStartupActivity : ProjectActivity {
         val compilingXml = File(
             FileUtilRt.toSystemDependentName(
                 project.basePath + "/" + hybrisProjectSettings.hybrisDirectory
-                        + HybrisConstants.PLATFORM_MODULE_PREFIX + HybrisConstants.ANT_COMPILING_XML
+                    + HybrisConstants.PLATFORM_MODULE_PREFIX + HybrisConstants.ANT_COMPILING_XML
             )
         )
         if (!compilingXml.isFile) return
