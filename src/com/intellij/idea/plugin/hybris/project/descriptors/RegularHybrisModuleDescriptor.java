@@ -245,20 +245,17 @@ public abstract class RegularHybrisModuleDescriptor extends AbstractHybrisModule
 
     private void addLibsForBackofficeModule(final List<JavaLibraryDescriptor> libs, final Project currentProject) {
         if (this.hasBackofficeModule()) {
-
-            final HybrisProjectSettingsComponent instance = HybrisProjectSettingsComponent.getInstance(currentProject);
-
             libs.add(new DefaultJavaLibraryDescriptor(
                 new File(
                     this.getRootProjectDescriptor().getHybrisDistributionDirectory(),
-                    instance.getBackofficeWebInfLib()
+                    HybrisProjectSettingsComponent.getInstance(currentProject).getBackofficeWebInfLib()
                 ),
                 false, false
             ));
             libs.add(new DefaultJavaLibraryDescriptor(
                 new File(
                     this.getRootProjectDescriptor().getHybrisDistributionDirectory(),
-                    instance.getBackofficeWebInfClasses()
+                    HybrisProjectSettingsComponent.getInstance(currentProject).getBackofficeWebInfClasses()
                 ),
                 false, true
             ));

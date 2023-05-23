@@ -24,7 +24,6 @@ import com.intellij.idea.plugin.hybris.project.descriptors.PlatformHybrisModuleD
 import com.intellij.idea.plugin.hybris.settings.HybrisDeveloperSpecificProjectSettingsComponent
 import com.intellij.idea.plugin.hybris.settings.HybrisRemoteConnectionSettings
 import com.intellij.openapi.command.CommandProcessor
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import org.apache.commons.lang3.StringUtils
@@ -52,9 +51,7 @@ class DefaultCommonIdeaService : CommonIdeaService {
             .map { it.name }
 
         val acceleratorNames = listOf("*cockpits", "*core", "*facades", "*storefront")
-        if (matchAllModuleNames(acceleratorNames, moduleNames)) {
-            return true
-        }
+        if (matchAllModuleNames(acceleratorNames, moduleNames)) return true
 
         val webservicesNames = listOf(
             "*${HybrisConstants.EXTENSION_NAME_HMC}",
@@ -68,9 +65,7 @@ class DefaultCommonIdeaService : CommonIdeaService {
     private fun matchAllModuleNames(
         namePatterns: Collection<String>,
         moduleNames: Collection<String>
-    ): Boolean {
-        return namePatterns.all { pattern: String -> matchModuleName(pattern, moduleNames) }
-    }
+    ) = namePatterns.all { matchModuleName(it, moduleNames) }
 
     override fun getPlatformDescriptor(hybrisProjectDescriptor: HybrisProjectDescriptor): PlatformHybrisModuleDescriptor? {
         return hybrisProjectDescriptor.foundModules
@@ -85,39 +80,36 @@ class DefaultCommonIdeaService : CommonIdeaService {
     }
 
     override fun getActiveSslProtocol(project: Project, settings: HybrisRemoteConnectionSettings?): String {
-        val currentSettings = settings ?: HybrisDeveloperSpecificProjectSettingsComponent.getInstance(project)
-            .getActiveHacRemoteConnectionSettings(project)
+        val currentSettings = getProjectSettings(project, settings)
 
-        return currentSettings?.sslProtocol ?: HybrisConstants.DEFAULT_SSL_PROTOCOL
+        return currentSettings
+            ?.sslProtocol
+            ?: HybrisConstants.DEFAULT_SSL_PROTOCOL
     }
 
     override fun getHostHacUrl(project: Project, settings: HybrisRemoteConnectionSettings?): String {
-        val currentSettings = settings ?: HybrisDeveloperSpecificProjectSettingsComponent.getInstance(project)
-            .getActiveHacRemoteConnectionSettings(project)
-
+        val currentSettings = getProjectSettings(project, settings)
         return getUrl(currentSettings)
     }
 
+    private fun getProjectSettings(project: Project, settings: HybrisRemoteConnectionSettings?): HybrisRemoteConnectionSettings? {
+        return settings ?: HybrisDeveloperSpecificProjectSettingsComponent.getInstance(project)
+            .getActiveHacRemoteConnectionSettings(project)
+    }
+
     override fun getSolrUrl(project: Project, settings: HybrisRemoteConnectionSettings?): String {
-        var currentSettings = settings
-        val sb = StringBuilder()
-        if (currentSettings == null) {
-            currentSettings = HybrisDeveloperSpecificProjectSettingsComponent.getInstance(project)
-                .getActiveSolrRemoteConnectionSettings(project)
-        }
-        if (currentSettings!!.isSsl) {
-            sb.append(HybrisConstants.HTTPS_PROTOCOL)
-        } else {
-            sb.append(HybrisConstants.HTTP_PROTOCOL)
-        }
-        sb.append(currentSettings.hostIP)
-        sb.append(":")
-        sb.append(currentSettings.port)
-        sb.append("/")
-        sb.append(currentSettings.solrWebroot)
-        val result = sb.toString()
-        LOG.debug("Calculated host SOLR URL=$result")
-        return result
+        val currentSettings = settings ?: HybrisDeveloperSpecificProjectSettingsComponent.getInstance(project)
+            .getActiveSolrRemoteConnectionSettings(project)
+
+        val solrUrl = StringBuilder()
+        if (currentSettings.isSsl) solrUrl.append(HybrisConstants.HTTPS_PROTOCOL) else solrUrl.append(HybrisConstants.HTTP_PROTOCOL)
+
+        return solrUrl.append(currentSettings.hostIP)
+            .append(":")
+            .append(currentSettings.port)
+            .append("/")
+            .append(currentSettings.solrWebroot)
+            .toString()
     }
 
     override fun fixRemoteConnectionSettings(project: Project) {
@@ -154,31 +146,25 @@ class DefaultCommonIdeaService : CommonIdeaService {
         val regex = Regex("\\Q$pattern\\E".replace("*", "\\E.*\\Q"))
         return moduleNames.stream()
             .parallel()
-            .anyMatch { it: String -> it.matches(regex) }
+            .anyMatch { it.matches(regex) }
     }
 
     private fun getUrl(settings: HybrisRemoteConnectionSettings?): String {
         val ip = settings!!.hostIP
-        val sb = StringBuilder()
-        if (settings.isSsl) {
-            sb.append(HybrisConstants.HTTPS_PROTOCOL)
-        } else {
-            sb.append(HybrisConstants.HTTP_PROTOCOL)
-        }
-        sb.append(ip)
-        sb.append(HybrisConstants.URL_PORT_DELIMITER)
-        sb.append(settings.port)
-        val hac = settings.hacWebroot
-        if (StringUtils.isNoneBlank(hac)) {
-            sb.append('/')
-            sb.append(StringUtils.strip(hac, " /"))
-        }
-        val result = sb.toString()
-        LOG.debug("Calculated hostHacURL=$result")
-        return result
-    }
+        val urlBuilder = StringBuilder()
+        if (settings.isSsl) urlBuilder.append(HybrisConstants.HTTPS_PROTOCOL) else urlBuilder.append(HybrisConstants.HTTP_PROTOCOL)
 
-    companion object {
-        private val LOG = Logger.getInstance(DefaultCommonIdeaService::class.java)
+        urlBuilder.append(ip)
+            .append(HybrisConstants.URL_PORT_DELIMITER)
+            .append(settings.port)
+
+        settings.hacWebroot
+            ?.takeUnless { it.isBlank() }
+            ?.let {
+                urlBuilder.append('/')
+                    .append(StringUtils.strip(it, " /"))
+            }
+
+        return urlBuilder.toString()
     }
 }

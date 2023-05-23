@@ -51,19 +51,19 @@ class HybrisProjectStructureStartupActivity : ProjectActivity {
         if (project.isDisposed) return
 
         val commonIdeaService = ApplicationManager.getApplication().getService(CommonIdeaService::class.java)
-        val instance = HybrisProjectSettingsComponent.getInstance(project)
-        val isHybrisProject = instance.isHybrisProject()
+        val projectSettings = HybrisProjectSettingsComponent.getInstance(project)
+        val isHybrisProject = projectSettings.isHybrisProject()
 
         if (isHybrisProject) {
-            instance.registerCloudExtensions()
+            projectSettings.registerCloudExtensions()
 
-            if (instance.isOutdatedHybrisProject()) {
+            if (projectSettings.isOutdatedHybrisProject()) {
                 Notifications.create(
                     NotificationType.INFORMATION,
                     HybrisI18NBundleUtils.message("hybris.notification.project.open.outdated.title"),
                     HybrisI18NBundleUtils.message(
                         "hybris.notification.project.open.outdated.text",
-                        instance.state.importedByVersion ?: "old"
+                        projectSettings.state.importedByVersion ?: "old"
                     )
                 )
                     .important(true)

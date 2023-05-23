@@ -32,6 +32,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.text.VersionComparatorUtil
 import com.intellij.util.xmlb.XmlSerializerUtil
 
+private const val PLATFORM_VERSION_1905_0 = "1905.0"
+
 @State(name = "HybrisProjectSettings", storages = [Storage(STORAGE_HYBRIS_PROJECT_SETTINGS)])
 class HybrisProjectSettingsComponent : PersistentStateComponent<HybrisProjectSettings> {
     private val hybrisProjectSettings = HybrisProjectSettings()
@@ -43,7 +45,8 @@ class HybrisProjectSettingsComponent : PersistentStateComponent<HybrisProjectSet
 
     fun isOutdatedHybrisProject(): Boolean {
         val lastImportVersion = hybrisProjectSettings.importedByVersion ?: return true
-        val currentVersion = PluginManagerCore.getPlugin(PluginId.getId(HybrisConstants.PLUGIN_ID))?.version
+        val currentVersion = PluginManagerCore.getPlugin(PluginId.getId(HybrisConstants.PLUGIN_ID))
+            ?.version
             ?: return true
 
         return VersionComparatorUtil.compare(currentVersion, lastImportVersion) > 0
@@ -75,20 +78,16 @@ class HybrisProjectSettingsComponent : PersistentStateComponent<HybrisProjectSet
     fun registerCloudExtensions() = HybrisConstants.CCV2_COMMERCE_CLOUD_EXTENSIONS
             .forEach { state.availableExtensions[it] = ExtensionDescriptor(it, HybrisModuleDescriptorType.CCV2) }
 
-    fun getBackofficeWebInfLib(): String {
-        return if (is2019VersionOrHigher()) HybrisConstants.BACKOFFICE_WEB_INF_LIB_2019 else HybrisConstants.BACKOFFICE_WEB_INF_LIB
-    }
+    fun getBackofficeWebInfLib() = if (is2019VersionOrHigher()) HybrisConstants.BACKOFFICE_WEB_INF_LIB_2019 else HybrisConstants.BACKOFFICE_WEB_INF_LIB
 
-    fun getBackofficeWebInfClasses(): String {
-        return if (is2019VersionOrHigher()) HybrisConstants.BACKOFFICE_WEB_INF_CLASSES_2019 else HybrisConstants.BACKOFFICE_WEB_INF_CLASSES
-    }
+    fun getBackofficeWebInfClasses() = if (is2019VersionOrHigher()) HybrisConstants.BACKOFFICE_WEB_INF_CLASSES_2019 else HybrisConstants.BACKOFFICE_WEB_INF_CLASSES
 
     private fun is2019VersionOrHigher(): Boolean {
         val hybrisVersion = state.hybrisVersion
         if (hybrisVersion.isNullOrBlank()) return false
 
         val projectVersion = Version.parseVersion(hybrisVersion)
-        return projectVersion >= Version.parseVersion("1905.0")
+        return projectVersion >= Version.parseVersion(PLATFORM_VERSION_1905_0)
     }
 
     private fun getModuleSettings(moduleName: String) = state.moduleSettings
