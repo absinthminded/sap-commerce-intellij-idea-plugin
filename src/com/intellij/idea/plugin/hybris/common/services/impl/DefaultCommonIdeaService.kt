@@ -26,22 +26,17 @@ import com.intellij.idea.plugin.hybris.settings.HybrisRemoteConnectionSettings
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
-import org.apache.commons.lang3.StringUtils
-
-val regex = Regex("https?://")
 
 class DefaultCommonIdeaService : CommonIdeaService {
     private val commandProcessor: CommandProcessor = CommandProcessor.getInstance()
     override fun isTypingActionInProgress(): Boolean {
-        val isTyping = HybrisConstants.TYPING_EDITOR_ACTIONS.any {
-            commandProcessor.currentCommandName.equals(it, true)
-        }
+        val currentCommandName = commandProcessor.currentCommandName ?: return false
 
-        val isUndoOrRedo = HybrisConstants.UNDO_REDO_EDITOR_ACTIONS.any {
-            commandProcessor.currentCommandName?.startsWith(it) ?: false
+        return HybrisConstants.TYPING_EDITOR_ACTIONS.any {
+            currentCommandName.equals(it, true)
+        } || HybrisConstants.UNDO_REDO_EDITOR_ACTIONS.any {
+            currentCommandName.startsWith(it)
         }
-
-        return isTyping || isUndoOrRedo
     }
 
     override fun isPotentiallyHybrisProject(project: Project): Boolean {
@@ -63,34 +58,31 @@ class DefaultCommonIdeaService : CommonIdeaService {
         return matchAllModuleNames(webservicesNames, moduleNames)
     }
 
-    private fun matchAllModuleNames(namePatterns: Collection<String>, moduleNames: Collection<String>) =
-        namePatterns
-            .all { matchModuleName(it, moduleNames) }
+    private fun matchAllModuleNames(namePatterns: Collection<String>, moduleNames: Collection<String>) = namePatterns
+        .all { matchModuleName(it, moduleNames) }
 
-    override fun getPlatformDescriptor(hybrisProjectDescriptor: HybrisProjectDescriptor): PlatformHybrisModuleDescriptor? {
-        return hybrisProjectDescriptor.foundModules
-            .firstNotNullOfOrNull { it as? PlatformHybrisModuleDescriptor }
-    }
+    override fun getPlatformDescriptor(hybrisProjectDescriptor: HybrisProjectDescriptor) = hybrisProjectDescriptor
+        .foundModules
+        .firstNotNullOfOrNull { it as? PlatformHybrisModuleDescriptor }
 
-    override fun getActiveHacUrl(project: Project) =
-        HybrisDeveloperSpecificProjectSettingsComponent
-            .getInstance(project)
-            .getActiveHacRemoteConnectionSettings(project)
-            .let { getUrl(it) }
+    override fun getActiveHacUrl(project: Project) = getActiveHacRemoteConnectionSettings(project)
+        .let { getUrl(it) }
 
-    override fun getActiveSslProtocol(project: Project, settings: HybrisRemoteConnectionSettings?) =
-        getProjectSettings(project, settings)
-            ?.sslProtocol
-            ?: HybrisConstants.DEFAULT_SSL_PROTOCOL
+    override fun getActiveSslProtocol(project: Project, settings: HybrisRemoteConnectionSettings?) = getProjectSettings(project, settings)
+        ?.sslProtocol
+        ?: HybrisConstants.DEFAULT_SSL_PROTOCOL
 
-    override fun getHostHacUrl(project: Project, settings: HybrisRemoteConnectionSettings?) =
-        getProjectSettings(project, settings)
-            .let(::getUrl)
+    override fun getHostHacUrl(project: Project, settings: HybrisRemoteConnectionSettings?) = getProjectSettings(project, settings)
+        .let(::getUrl)
 
     private fun getProjectSettings(project: Project, settings: HybrisRemoteConnectionSettings?) =
-        settings ?: HybrisDeveloperSpecificProjectSettingsComponent.getInstance(project)
+        settings ?: getActiveHacRemoteConnectionSettings(project)
+
+    private fun getActiveHacRemoteConnectionSettings(project: Project) =
+        HybrisDeveloperSpecificProjectSettingsComponent.getInstance(project)
             .getActiveHacRemoteConnectionSettings(project)
 
+    //TODO: with enabling kotlin DSL 2.0 settings shouldn't be required anymore
     override fun getSolrUrl(project: Project, settings: HybrisRemoteConnectionSettings?): String {
         val currentSettings = settings ?: HybrisDeveloperSpecificProjectSettingsComponent.getInstance(project)
             .getActiveSolrRemoteConnectionSettings(project)
@@ -127,18 +119,21 @@ class DefaultCommonIdeaService : CommonIdeaService {
     }
 
     private fun prepareSslRemoteConnectionSettings(connectionSettings: HybrisRemoteConnectionSettings) {
-        connectionSettings.isSsl = connectionSettings.generatedURL?.startsWith(HybrisConstants.HTTPS_PROTOCOL) ?: false
+        connectionSettings.isSsl = connectionSettings.generatedURL
+            ?.startsWith(HybrisConstants.HTTPS_PROTOCOL)
+            ?: false
+
         cleanUpRemoteConnectionSettingsHostIp(connectionSettings)
     }
 
     private fun cleanUpRemoteConnectionSettingsHostIp(connectionSettings: HybrisRemoteConnectionSettings) {
-        connectionSettings.hostIP = connectionSettings.hostIP?.replace(regex, "")
+        val regex = Regex("https?://")
+        connectionSettings.hostIP = connectionSettings.hostIP
+            ?.replace(regex, "")
     }
 
-    private fun matchModuleName(pattern: String, moduleNames: Collection<String>) =
-        moduleNames
-            .any { it.matches(Regex("\\Q$pattern\\E".replace("*", "\\E.*\\Q"))) }
-
+    private fun matchModuleName(pattern: String, moduleNames: Collection<String>) = moduleNames
+        .any { it.matches(Regex("\\Q$pattern\\E".replace("*", "\\E.*\\Q"))) }
 
     private fun getUrl(settings: HybrisRemoteConnectionSettings) =
         buildString {
@@ -151,7 +146,10 @@ class DefaultCommonIdeaService : CommonIdeaService {
                 ?.takeUnless { it.isBlank() }
                 ?.let {
                     append('/')
-                    append(StringUtils.strip(it, " /"))
+                    append(
+                        it.trimStart(' ', '/')
+                            .trimEnd(' ', '/')
+                    )
                 }
         }
 }
