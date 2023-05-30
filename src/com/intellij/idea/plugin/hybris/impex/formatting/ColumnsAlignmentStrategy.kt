@@ -30,16 +30,20 @@ import org.jetbrains.annotations.Contract
 
 open class ColumnsAlignmentStrategy : AlignmentStrategy {
 
-    private val alignments: MutableList<Alignment> = ArrayList();
-    private var columnNumber = 0;
+    private val alignments: MutableList<Alignment> = mutableListOf()
+    private var columnNumber = 0
 
     override fun getAlignment(currentNode: ASTNode): Alignment {
         if (!isNewColumn(currentNode)) return Alignment.createAlignment()
-        if (columnNumber < alignments.size) return alignments[columnNumber]
 
-        val alignment = Alignment.createAlignment(true, Alignment.Anchor.LEFT);
-        alignments.add(alignment);
-        columnNumber++;
+        val alignment: Alignment
+        if (columnNumber >= alignments.size) {
+            alignment = Alignment.createAlignment(true, Alignment.Anchor.LEFT)
+            alignments.add(alignment)
+        } else {
+            alignment = alignments[columnNumber]
+        }
+        columnNumber++
 
         return alignment;
     }
@@ -52,17 +56,11 @@ open class ColumnsAlignmentStrategy : AlignmentStrategy {
         }
 
         when {
-            isNewLine(currentNode) -> {
-                columnNumber = 0
-            }
+            isNewLine(currentNode) -> columnNumber = 0
 
-            isHeaderLine(currentNode) -> {
-                alignments.clear()
-            }
+            isHeaderLine(currentNode) -> alignments.clear()
 
-            ImpexPsiUtils.isUserRightsMacros(currentNode.psi) -> {
-                alignments.clear()
-            }
+            ImpexPsiUtils.isUserRightsMacros(currentNode.psi) -> alignments.clear()
         }
     }
 
@@ -78,8 +76,8 @@ open class ColumnsAlignmentStrategy : AlignmentStrategy {
         || ImpexTypes.USER_RIGHTS_VALUE_GROUP == currentNode.elementType
 
     @Contract(pure = true)
-    fun isStartOfValueLine(currentNode: ASTNode) =
-        PsiTreeUtil.findChildOfAnyType(
+    fun isStartOfValueLine(currentNode: ASTNode) = PsiTreeUtil
+        .findChildOfAnyType(
             currentNode.treeParent.psi,
             ImpexValueGroup::class.java,
             ImpexUserRightsValueGroup::class.java
