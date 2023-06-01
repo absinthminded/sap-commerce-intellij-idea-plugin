@@ -49,9 +49,9 @@ open class ColumnsAlignmentStrategy : AlignmentStrategy {
     }
 
     override fun processNode(currentNode: ASTNode) {
-        if (!isStartOfTheFile(currentNode)) {
-            columnNumber = 0;
-            alignments.clear();
+        if (isStartOfTheFile(currentNode)) {
+            columnNumber = 0
+            alignments.clear()
             return
         }
 
