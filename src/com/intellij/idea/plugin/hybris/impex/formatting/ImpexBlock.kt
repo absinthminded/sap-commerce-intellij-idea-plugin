@@ -28,14 +28,14 @@ class ImpexBlock(
             alignmentStrategy.processNode(currentNode)
 
             if (isNewBlockToBeMade(currentNode)) {
-                ImpexBlock(
-                    currentNode,
-                    null,
-                    alignmentStrategy.getAlignment(currentNode),
-                    spacingBuilder,
-                    codeStyleSettings,
-                    alignmentStrategy
-                ).let { blocks.add(it) }
+                val block = ImpexBlock(
+                    node = currentNode,
+                    alignment = alignmentStrategy.getAlignment(currentNode),
+                    spacingBuilder = spacingBuilder,
+                    codeStyleSettings = codeStyleSettings,
+                    alignmentStrategy = alignmentStrategy
+                )
+                blocks.add(block)
             }
 
             currentNode = currentNode.treeNext

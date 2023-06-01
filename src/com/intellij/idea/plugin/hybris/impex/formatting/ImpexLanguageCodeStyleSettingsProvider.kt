@@ -26,176 +26,185 @@ import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 
 class ImpexLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider() {
 
-    override fun getLanguage(): Language {
-        return ImpexLanguage.getInstance()
-    }
+    override fun getLanguage(): Language = ImpexLanguage.getInstance()
 
     override fun customizeSettings(consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType) {
-        if (settingsType == SettingsType.SPACING_SETTINGS) {
-            val styleOptions = CodeStyleSettingsCustomizableOptions.getInstance()
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "TABLIFY",
-                "Formatting in table-like style",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        if (settingsType == SettingsType.SPACING_SETTINGS) applySpacingSettings(consumer)
+        if (settingsType == SettingsType.BLANK_LINES_SETTINGS) applyBlankLineSettings(consumer)
+    }
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_AFTER_FIELD_VALUE_SEPARATOR",
-                "After field value separator",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+    private fun applySpacingSettings(consumer: CodeStyleSettingsCustomizable) {
+        val styleOptions = CodeStyleSettingsCustomizableOptions.getInstance()
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "TABLIFY",
+            "Formatting in table-like style",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_BEFORE_FIELD_VALUE_SEPARATOR",
-                "Before field value separator",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_AFTER_FIELD_VALUE_SEPARATOR",
+            "After field value separator",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_AFTER_PARAMETERS_SEPARATOR",
-                "After parameters separator",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_BEFORE_FIELD_VALUE_SEPARATOR",
+            "Before field value separator",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_BEFORE_PARAMETERS_SEPARATOR",
-                "Before parameters separator",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_AFTER_PARAMETERS_SEPARATOR",
+            "After parameters separator",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_AFTER_COMMA",
-                "After comma",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_BEFORE_PARAMETERS_SEPARATOR",
+            "Before parameters separator",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_BEFORE_COMMA",
-                "Before comma",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_AFTER_COMMA",
+            "After comma",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_AFTER_ATTRIBUTE_SEPARATOR",
-                "After attribute separator",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_BEFORE_COMMA",
+            "Before comma",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_BEFORE_ATTRIBUTE_SEPARATOR",
-                "Before attribute separator",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_AFTER_ATTRIBUTE_SEPARATOR",
+            "After attribute separator",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_AFTER_FIELD_LIST_ITEM_SEPARATOR",
-                "After list item separator",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_BEFORE_ATTRIBUTE_SEPARATOR",
+            "Before attribute separator",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_BEFORE_FIELD_LIST_ITEM_SEPARATOR",
-                "Before list item separator",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_AFTER_FIELD_LIST_ITEM_SEPARATOR",
+            "After list item separator",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_AFTER_ASSIGN_VALUE",
-                "After assign value",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_BEFORE_FIELD_LIST_ITEM_SEPARATOR",
+            "Before list item separator",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_BEFORE_ASSIGN_VALUE",
-                "Before assign value",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_AFTER_ASSIGN_VALUE",
+            "After assign value",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_AFTER_LEFT_ROUND_BRACKET",
-                "After left round bracket",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_BEFORE_ASSIGN_VALUE",
+            "Before assign value",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_BEFORE_RIGHT_ROUND_BRACKET",
-                "Before right round bracket",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_AFTER_LEFT_ROUND_BRACKET",
+            "After left round bracket",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_AFTER_LEFT_SQUARE_BRACKET",
-                "After left square bracket",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_BEFORE_RIGHT_ROUND_BRACKET",
+            "Before right round bracket",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_BEFORE_RIGHT_SQUARE_BRACKET",
-                "Before right square bracket",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_AFTER_LEFT_SQUARE_BRACKET",
+            "After left square bracket",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_AFTER_ALTERNATIVE_PATTERN",
-                "After alternative pattern",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_BEFORE_RIGHT_SQUARE_BRACKET",
+            "Before right square bracket",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-            consumer.showCustomOption(
-                ImpexCodeStyleSettings::class.java,
-                "SPACE_BEFORE_ALTERNATIVE_PATTERN",
-                "Before alternative pattern",
-                styleOptions.SPACES_AROUND_OPERATORS
-            )
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_AFTER_ALTERNATIVE_PATTERN",
+            "After alternative pattern",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
 
-        } else if (settingsType == SettingsType.BLANK_LINES_SETTINGS) {
-            consumer.showStandardOptions("KEEP_BLANK_LINES_IN_CODE")
-        }
+        consumer.showCustomOption(
+            ImpexCodeStyleSettings::class.java,
+            "SPACE_BEFORE_ALTERNATIVE_PATTERN",
+            "Before alternative pattern",
+            styleOptions.SPACES_AROUND_OPERATORS
+        )
+    }
+
+    private fun applyBlankLineSettings(consumer: CodeStyleSettingsCustomizable) {
+        consumer.showStandardOptions("KEEP_BLANK_LINES_IN_CODE")
     }
 
     override fun getCodeSample(settingsType: SettingsType): String {
-        return "# Comment\n" +
-            "\$lang = en\n" +
-            "\$contentCatalog = projectContentCatalog\n" +
-            "\$contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default = \$contentCatalog]),CatalogVersion.version[default = 'Staged'])[default = \$contentCatalog:Staged]\n" +
-            "\$macro = qwe;qwe,qwe,;qwe\n" +
-            '\n' +
-            "#% impex.setLocale( Locale.GERMAN );\n" +
-            '\n' +
-            "INSERT_UPDATE SomeType ; \$contentCV[unique = true][map-delimiter = |][dateformat = yyyy-MM-dd HH:mm:ss] ; uid[unique = true]          ; title[lang = \$lang]\n" +
-            "Subtype                ;                                                                                ; account                     ; \"Your Account\"\n" +
-            "                       ;                                                                                ; <ignore>                    ; \"Add/Edit Address\"\n" +
-            "                       ;                                                                                ; key -> value | key -> value ; \"Address Book\"\n" +
-            "                       ;                                                                                ; value1, value2, value3      ; 12345               ;" +
-            '\n' +
-            "INSERT Address[impex.legacy.mode = true, batchmode = true] ; firstname ; owner(Principal.uid | AbstractOrder.code)\n" +
-            "                                                           ; Hans      ; admin\n" +
-            '\n' +
-            "UPDATE Address ; firstname ; owner(Principal.uid | AbstractOrder.code) ; &docId\n" +
-            "               ; Hans      ; admin                                     ; id\n" +
-            '\n' +
-            "remove Address ; firstname ; owner(Principal.uid | AbstractOrder.code)\n" +
-            "               ; Hans      ; admin\n" +
-            '\n' +
-            "INSERT_UPDATE Media ; @media[translator = de.hybris.platform.impex.jalo.media.MediaDataTranslato r] ; mime[default = 'image/png']\n" +
-            "                    ;                                                                               ; \$contentResource/images/logo .png\n"
+        val lang = "\$lang"
+        val contentCatalog = "\$contentCatalog"
+        val contentCV = "\$contentCV"
+        val macro = "\$macro"
+        val contentResource = "\$contentResource"
+        return """
+            # Comment
+            $lang = en
+            $contentCatalog = projectContentCatalog
+            $contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default = \$contentCatalog]),CatalogVersion.version[default = 'Staged'])[default = \$contentCatalog:Staged]
+            $macro = qwe;qwe,qwe,;qwe
+        
+            #% impex.setLocale( Locale.GERMAN );
+        
+            INSERT_UPDATE SomeType ; \$contentCV[unique = true][map-delimiter = |][dateformat = yyyy-MM-dd HH:mm:ss] ; uid[unique = true]          ; title[lang = \$lang]
+            Subtype                ;                                                                                ; account                     ; "Your Account"
+                                   ;                                                                                ; <ignore>                    ; "Add/Edit Address"
+                                   ;                                                                                ; key -> value | key -> value ; "Address Book"
+                                   ;                                                                                ; value1, value2, value3      ; 12345               ;
+        
+            INSERT Address[impex.legacy.mode = true, batchmode = true] ; firstname ; owner(Principal.uid | AbstractOrder.code)
+                                                                       ; Hans      ; admin
+        
+            UPDATE Address ; firstname ; owner(Principal.uid | AbstractOrder.code) ; &docId
+                           ; Hans      ; admin                                     ; id
+        
+            remove Address ; firstname ; owner(Principal.uid | AbstractOrder.code)
+                           ; Hans      ; admin
+        
+            INSERT_UPDATE Media ; @media[translator = de.hybris.platform.impex.jalo.media.MediaDataTranslato r] ; mime[default = 'image/png']
+                                ;                                                                               ; $contentResource/images/logo .png
+            """.trimIndent()
     }
 }
