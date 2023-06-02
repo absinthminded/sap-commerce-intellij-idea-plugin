@@ -29,8 +29,11 @@ class ImpexLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider
     override fun getLanguage(): Language = ImpexLanguage.getInstance()
 
     override fun customizeSettings(consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType) {
-        if (settingsType == SettingsType.SPACING_SETTINGS) applySpacingSettings(consumer)
-        if (settingsType == SettingsType.BLANK_LINES_SETTINGS) applyBlankLineSettings(consumer)
+        when (settingsType) {
+            SettingsType.SPACING_SETTINGS -> applySpacingSettings(consumer)
+            SettingsType.BLANK_LINES_SETTINGS ->  applyBlankLineSettings(consumer)
+            else -> return
+        }
     }
 
     private fun applySpacingSettings(consumer: CodeStyleSettingsCustomizable) {
