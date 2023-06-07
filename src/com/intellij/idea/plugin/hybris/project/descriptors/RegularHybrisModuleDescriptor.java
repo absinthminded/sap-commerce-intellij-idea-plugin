@@ -21,6 +21,7 @@ package com.intellij.idea.plugin.hybris.project.descriptors;
 import com.google.common.collect.Sets;
 import com.intellij.idea.plugin.hybris.common.HybrisConstants;
 import com.intellij.idea.plugin.hybris.common.LibraryDescriptorType;
+import com.intellij.idea.plugin.hybris.common.services.CommonIdeaService;
 import com.intellij.idea.plugin.hybris.project.exceptions.HybrisConfigurationException;
 import com.intellij.idea.plugin.hybris.project.settings.jaxb.extensioninfo.ExtensionInfo;
 import com.intellij.idea.plugin.hybris.project.settings.jaxb.extensioninfo.MetaType;
