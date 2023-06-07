@@ -26,11 +26,11 @@ class OotbClassesSearchScope(project: Project) : GlobalSearchScope(project) {
             return HybrisUtil.isHybrisModuleRoot(virtualFile)
         }
 
-        virtualFile = JarFileSystem.getInstance().getVirtualFileForJar(file) ?: return false
-
-        virtualFile = virtualFile.parent
-
-        return virtualFile.path.endsWith("${HybrisConstants.PLATFORM_BOOTSTRAP_DIRECTORY}/${HybrisConstants.BIN_DIRECTORY}")
+        return JarFileSystem.getInstance().getVirtualFileForJar(file)
+            ?.parent
+            ?.path
+            ?.endsWith("${HybrisConstants.PLATFORM_BOOTSTRAP_DIRECTORY}/${HybrisConstants.BIN_DIRECTORY}")
+            ?: false
     }
 
     private fun isNotClassesOrDirectories(virtualFile: VirtualFile) =

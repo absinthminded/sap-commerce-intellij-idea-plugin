@@ -20,7 +20,7 @@ class CustomGotoClassContributor : GotoClassContributor {
     override fun getQualifiedNameSeparator() = null
 
     override fun getNames(project: Project, includeNonProjectItems: Boolean): Array<String> {
-        if (shouldNotBeProcessed(includeNonProjectItems, project)) return ArrayUtil.EMPTY_STRING_ARRAY
+        if (shouldNotBeProcessed(includeNonProjectItems, project)) return emptyArray()
 
         val result = ArrayList<String>()
         val scope = OotbClassesSearchScope(project)
@@ -30,7 +30,7 @@ class CustomGotoClassContributor : GotoClassContributor {
 
         shortNamesCache.processAllClassNames(processor, scope, projectIdFilter)
 
-        return ArrayUtil.toStringArray(result)
+        return result.toTypedArray()
     }
 
     override fun getItemsByName(
@@ -48,7 +48,8 @@ class CustomGotoClassContributor : GotoClassContributor {
 
         defaultClassNavigationContributor.processElementsWithName(name, processor, symbolParameters)
 
-        return if (result.isEmpty()) NavigationItem.EMPTY_NAVIGATION_ITEM_ARRAY else result.toTypedArray()
+        return if (result.isEmpty()) NavigationItem.EMPTY_NAVIGATION_ITEM_ARRAY
+        else result.toTypedArray()
     }
 
     private fun shouldNotBeProcessed(includeNonProjectItems: Boolean, project: Project) = includeNonProjectItems
