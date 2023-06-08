@@ -20,13 +20,9 @@ package com.intellij.idea.plugin.hybris.impex.assistance;
 
 import com.intellij.openapi.application.ApplicationManager;
 
-/**
- * @author Aleksandr Nosov <nosovae.dev@gmail.com>
- */
-public interface ImpexColumnHighlighterService extends ImpexHighlighterService {
+interface ImpexHeaderNameHighlighterService : ImpexHighlighterService {
 
-    static ImpexColumnHighlighterService getInstance() {
-        return ApplicationManager.getApplication().getService(ImpexColumnHighlighterService.class);
+    companion object {
+        val instance: ImpexHeaderNameHighlighterService = ApplicationManager.getApplication().getService(ImpexHeaderNameHighlighterService::class.java)
     }
-
 }
