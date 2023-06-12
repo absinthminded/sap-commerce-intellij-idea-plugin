@@ -1,6 +1,6 @@
 /*
  * This file is part of "hybris integration" plugin for Intellij IDEA.
- * Copyright (C) 2014-2016 Alexander Bartash <AlexanderBartash@gmail.com>
+ * Copyright (C) 2019 EPAM Systems <hybrisideaplugin@epam.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,7 +27,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import java.util.concurrent.ConcurrentHashMap
 
 class DefaultImpexHeaderNameHighlighterService :
     AbstractImpexHighlighterService(),
@@ -54,52 +53,49 @@ class DefaultImpexHeaderNameHighlighterService :
                 }
 
             highlightedBlocks[editor] = impexFullHeaderParameter
-            modifyHighlightedArea(editor, impexFullHeaderParameter, false)
+            modifyHighlightedArea(editor, impexFullHeaderParameter)
         }
     }
 
     private fun clearHighlightedArea(editor: Editor) {
         if (highlightedBlocks.isEmpty()) return
 
-        highlightedBlocks.remove(editor)
-            ?.let {
-                ApplicationManager.getApplication().invokeLater {
-                    modifyHighlightedArea(editor, it, true)
-                }
-            }
+        val impexFullHeaderParameter = highlightedBlocks.remove(editor) ?: return
+
+        ApplicationManager.getApplication().invokeLater{
+            modifyHighlightedArea(editor, impexFullHeaderParameter, true)
+        }
     }
 
-    private fun isAlreadyHighlighted(
-        editor: Editor,
-        impexFullHeaderParameter: PsiElement
-    ) = highlightedBlocks[editor] == impexFullHeaderParameter
+    private fun isAlreadyHighlighted(editor: Editor, fullHeaderParameter: PsiElement) =
+        highlightedBlocks[editor] == fullHeaderParameter
 
     private fun modifyHighlightedArea(
         editor: Editor,
         impexFullHeaderParameter: PsiElement,
-        clear: Boolean
+        clear: Boolean = false,
     ) {
         val project = editor.project ?: return
         if (project.isDisposed) return
 
         removeInvalidRangeHighlighters(editor)
 
-        if (isTextRangeNotFolded(editor, impexFullHeaderParameter)) {
-            val ranges = mutableListOf<TextRange>()
-            ranges.add(impexFullHeaderParameter.textRange)
+        if (isTextRangeFolded(editor, impexFullHeaderParameter)) return
 
-            HighlightUsagesHandler.highlightRanges(
-                HighlightManager.getInstance(project),
-                editor,
-                EditorColors.SEARCH_RESULT_ATTRIBUTES,
-                clear,
-                ranges
-            )
-        }
+        val ranges = mutableListOf<TextRange>()
+        ranges.add(impexFullHeaderParameter.textRange)
+
+        HighlightUsagesHandler.highlightRanges(
+            HighlightManager.getInstance(project),
+            editor,
+            EditorColors.SEARCH_RESULT_ATTRIBUTES,
+            clear,
+            ranges
+        )
     }
 
-    private fun isTextRangeNotFolded(editor: Editor, impexFullHeaderParameter: PsiElement) =
-        !FoldingUtil.isTextRangeFolded(editor, impexFullHeaderParameter.textRange)
+    private fun isTextRangeFolded(editor: Editor, impexFullHeaderParameter: PsiElement) = FoldingUtil
+        .isTextRangeFolded(editor, impexFullHeaderParameter.textRange)
 
     override fun releaseEditorData(editor: Editor) {
         highlightedBlocks.remove(editor)
