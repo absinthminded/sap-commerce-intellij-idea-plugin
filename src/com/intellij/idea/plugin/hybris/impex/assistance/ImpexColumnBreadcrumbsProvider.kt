@@ -70,17 +70,12 @@ class ImpexColumnBreadcrumbsProvider : BreadcrumbsProvider {
             is ImpexAnyHeaderMode -> adjustedPsi
             is ImpexFullHeaderParameter -> {
                 val line = getImpexHeaderLine(adjustedPsi)
-                line
-                    ?.fullHeaderType
-                    ?: line
-                        ?.anyHeaderMode
-                    ?: line
+                line?.fullHeaderType
+                    ?: line?.anyHeaderMode
             }
 
-            is ImpexFullHeaderType -> {
-                getImpexHeaderLine(adjustedPsi)
+            is ImpexFullHeaderType -> getImpexHeaderLine(adjustedPsi)
                     ?.anyHeaderMode
-            }
 
             else -> {
                 PsiTreeUtil.getParentOfType(
