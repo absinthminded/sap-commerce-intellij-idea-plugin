@@ -28,9 +28,7 @@ import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 
-class DefaultImpexHeaderNameHighlighterService :
-    AbstractImpexHighlighterService(),
-    ImpexHeaderNameHighlighterService {
+class DefaultImpexHeaderNameHighlighterService : AbstractImpexHighlighterService(), ImpexHeaderNameHighlighterService {
 
     private val highlightedBlocks = mutableMapOf<Editor, PsiElement>()
 
@@ -48,9 +46,7 @@ class DefaultImpexHeaderNameHighlighterService :
 
         ApplicationManager.getApplication().invokeLater {
             highlightedBlocks.remove(editor)
-                ?.let {
-                    modifyHighlightedArea(editor, it, true)
-                }
+                ?.let { modifyHighlightedArea(editor, it, true) }
 
             highlightedBlocks[editor] = impexFullHeaderParameter
             modifyHighlightedArea(editor, impexFullHeaderParameter)
@@ -62,7 +58,7 @@ class DefaultImpexHeaderNameHighlighterService :
 
         val impexFullHeaderParameter = highlightedBlocks.remove(editor) ?: return
 
-        ApplicationManager.getApplication().invokeLater{
+        ApplicationManager.getApplication().invokeLater {
             modifyHighlightedArea(editor, impexFullHeaderParameter, true)
         }
     }

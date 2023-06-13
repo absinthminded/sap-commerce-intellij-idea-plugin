@@ -26,7 +26,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.ui.breadcrumbs.BreadcrumbsProvider
-import com.intellij.util.ObjectUtils
 
 class ImpexColumnBreadcrumbsProvider : BreadcrumbsProvider {
 
@@ -42,26 +41,18 @@ class ImpexColumnBreadcrumbsProvider : BreadcrumbsProvider {
 
         val adjustedPsi = adjustWhiteSpaceAndSeparator(psi)
 
-        when (val parent = PsiTreeUtil.getParentOfType(
+        val parent = PsiTreeUtil.getParentOfType(
             adjustedPsi,
             ImpexFullHeaderParameter::class.java,
             ImpexAnyHeaderMode::class.java,
             ImpexFullHeaderType::class.java
         )
-        ) {
-            is ImpexFullHeaderParameter -> {
-                return parent.text
-            }
 
-            is ImpexAnyHeaderMode -> {
-                return parent.text
-            }
-
-            is ImpexFullHeaderType -> {
-                return parent.headerTypeName.text
-            }
-
-            else -> return "<error> : ${psi.node.elementType} : ${psi.text}"
+        return when (parent) {
+            is ImpexFullHeaderParameter -> parent.text
+            is ImpexAnyHeaderMode -> parent.text
+            is ImpexFullHeaderType -> parent.headerTypeName.text
+            else -> "<error> : ${psi.node.elementType} : ${psi.text}"
         }
     }
 
@@ -74,11 +65,12 @@ class ImpexColumnBreadcrumbsProvider : BreadcrumbsProvider {
 
         if (element is ImpexAnyHeaderMode) return null
 
-        when (val adjustedPsi = adjustWhiteSpaceAndSeparator(element)) {
-            is ImpexAnyHeaderMode -> return adjustedPsi
+        val adjustedPsi = adjustWhiteSpaceAndSeparator(element)
+        return when (adjustedPsi) {
+            is ImpexAnyHeaderMode -> adjustedPsi
             is ImpexFullHeaderParameter -> {
                 val line = getImpexHeaderLine(adjustedPsi)
-                return line
+                line
                     ?.fullHeaderType
                     ?: line
                         ?.anyHeaderMode
@@ -86,12 +78,12 @@ class ImpexColumnBreadcrumbsProvider : BreadcrumbsProvider {
             }
 
             is ImpexFullHeaderType -> {
-                return getImpexHeaderLine(adjustedPsi)
+                getImpexHeaderLine(adjustedPsi)
                     ?.anyHeaderMode
             }
 
             else -> {
-                return PsiTreeUtil.getParentOfType(
+                PsiTreeUtil.getParentOfType(
                     adjustedPsi,
                     ImpexValueGroup::class.java,
                     ImpexFullHeaderParameter::class.java,
@@ -108,7 +100,7 @@ class ImpexColumnBreadcrumbsProvider : BreadcrumbsProvider {
     private fun getLinkedHeaderParameter(psi: PsiElement): ImpexFullHeaderParameter? = ImpexPsiUtils
         .getClosestSelectedValueGroupFromTheSameLine(psi)
         ?.let { ImpexPsiUtils.getHeaderForValueGroup(it) }
-        ?.let { ObjectUtils.tryCast(it, ImpexFullHeaderParameter::class.java) }
+        as? ImpexFullHeaderParameter
 
     private fun adjustWhiteSpaceAndSeparator(psiElement: PsiElement): PsiElement {
         if (psiElement is PsiWhiteSpace) {
