@@ -41,19 +41,16 @@ class ImpexColumnBreadcrumbsProvider : BreadcrumbsProvider {
 
         val adjustedPsi = adjustWhiteSpaceAndSeparator(psi)
 
-        val parent = PsiTreeUtil.getParentOfType(
-            adjustedPsi,
-            ImpexFullHeaderParameter::class.java,
-            ImpexAnyHeaderMode::class.java,
-            ImpexFullHeaderType::class.java
-        )
+        val parentParameter = PsiTreeUtil.getParentOfType(adjustedPsi, ImpexFullHeaderParameter::class.java, false)
+        if (parentParameter != null) return parentParameter.text
 
-        return when (parent) {
-            is ImpexFullHeaderParameter -> parent.text
-            is ImpexAnyHeaderMode -> parent.text
-            is ImpexFullHeaderType -> parent.headerTypeName.text
-            else -> "<error> : ${psi.node.elementType} : ${psi.text}"
-        }
+        val mode = PsiTreeUtil.getParentOfType(adjustedPsi, ImpexAnyHeaderMode::class.java, false)
+        if (mode != null) return mode.text
+
+        val type = PsiTreeUtil.getParentOfType(adjustedPsi, ImpexFullHeaderType::class.java, false)
+        if (type != null) return type.headerTypeName.text
+
+        return "<error> : ${psi.node.elementType} : ${psi.text}"
     }
 
     override fun getParent(element: PsiElement): PsiElement? {
