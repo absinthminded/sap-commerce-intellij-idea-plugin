@@ -75,7 +75,7 @@ class ImpexColumnBreadcrumbsProvider : BreadcrumbsProvider {
             }
 
             is ImpexFullHeaderType -> getImpexHeaderLine(adjustedPsi)
-                    ?.anyHeaderMode
+                ?.anyHeaderMode
 
             else -> {
                 PsiTreeUtil.getParentOfType(
@@ -94,19 +94,19 @@ class ImpexColumnBreadcrumbsProvider : BreadcrumbsProvider {
 
     private fun getLinkedHeaderParameter(psi: PsiElement): ImpexFullHeaderParameter? = ImpexPsiUtils
         .getClosestSelectedValueGroupFromTheSameLine(psi)
-        ?.let { ImpexPsiUtils.getHeaderForValueGroup(it) }
-        as? ImpexFullHeaderParameter
+        ?.fullHeaderParameter
+}
 
-    private fun adjustWhiteSpaceAndSeparator(psiElement: PsiElement): PsiElement {
-        if (psiElement is PsiWhiteSpace) {
-            val previousElement = PsiTreeUtil.skipSiblingsBackward(psiElement, PsiWhiteSpace::class.java)
-            if (previousElement != null) return previousElement
-        } else if (isParameterSeparator(psiElement)) {
-            return psiElement.nextSibling
-        }
-        return psiElement
+private fun adjustWhiteSpaceAndSeparator(psiElement: PsiElement): PsiElement {
+    if (psiElement is PsiWhiteSpace) {
+        val previousElement = PsiTreeUtil.skipSiblingsBackward(psiElement, PsiWhiteSpace::class.java)
+        if (previousElement != null) return previousElement
+    } else if (isParameterSeparator(psiElement)) {
+        return psiElement.nextSibling
     }
+    return psiElement
+}
 
-    private fun isParameterSeparator(psi: PsiElement) = psi.node.elementType == ImpexTypes.PARAMETERS_SEPARATOR
-        && psi.nextSibling != null
+private fun isParameterSeparator(psi: PsiElement) = psi.node.elementType == ImpexTypes.PARAMETERS_SEPARATOR
+    && psi.nextSibling != null
 }
